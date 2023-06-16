@@ -5,6 +5,14 @@ const main = () => {
   let ctx;
   let countY = 0;
   let countX = 0;
+  let brickRowCount = 3;
+  let brickColumnCount = 5;
+  let brickWidth = 85;
+  let brickHeight = 30;
+  let brickPadding = 10;
+  let brickOffsetTop = 250;
+  let brickOffsetLeft = 530;
+
 
   canvasDom = document.getElementById("canvas");
   canvasDom.width = window.innerWidth;
@@ -27,6 +35,14 @@ const main = () => {
     height: 50,
   };
 
+    let bricks = [];
+    for(let c=0; c<brickColumnCount; c++) {
+      bricks[c] = [];
+        for(let r=0; r<brickRowCount; r++) {
+          bricks[c][r] = { x: 0, y: 0, isBroken: false };
+    }
+}
+
   function display() {
     ctx.clearRect(0, 0, canvasDom.width, canvasDom.height);
     ctx.fillStyle = "#F8E8D1";
@@ -34,7 +50,9 @@ const main = () => {
     ctx.fillStyle = circle.color;
     displayBar();
     displayCircle();
-    displayText;
+    displayText();
+    drawBricks();
+    collisionDetection();
   }
 
   function displayText() {
@@ -130,6 +148,55 @@ const main = () => {
   }
   display();
   displayText();
+
+function drawBricks() {
+    for(let c=0; c<brickColumnCount; c++) {
+        for(let r=0; r<brickRowCount; r++) {
+            let brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+            let brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+            bricks[c][r].x = brickX;
+           bricks[c][r].y = brickY;
+          
+          if (bricks[c][r].isBroken === false) {
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "#E9A341";
+            ctx.fill();
+            ctx.closePath();
+          }
+          
+           
+        }
+    }
+  }
+  
+  
+
+  drawBricks();
+
+  function collisionDetection() {
+    for (let c = 0; c < brickColumnCount; c++) {
+      for (let r = 0; r < brickRowCount; r++) {
+        let b = bricks[c][r];
+        if (
+          b.isBroken === false &&
+          circle.x > b.x &&
+          circle.x < b.x + brickWidth &&
+          circle.y > b.y &&
+          circle.y < b.y + brickHeight
+        ) {
+          currentDirectionVertical = currentDirectionVertical * -1;
+          bricks[c][r].isBroken = true;
+        }
+      }
+    }
+  }
+    
+  
+  
+  collisionDetection();
+
+
 };
 
 window.addEventListener("load", main);
